@@ -2,11 +2,11 @@ package io.github.zerthick.coinpurse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import io.github.zerthick.coinpurse.cmd.CommandRegister;
 import io.github.zerthick.coinpurse.data.CoinPurseDataRegister;
 import io.github.zerthick.coinpurse.data.CoinPurseKeys;
+import io.github.zerthick.coinpurse.data.mutable.CoinPurseData;
 import org.slf4j.Logger;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.type.DyeColors;
@@ -14,12 +14,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
@@ -28,17 +26,12 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
-import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.Color;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
 @Plugin(
         id = "coinpurse",
@@ -78,8 +71,9 @@ public class CoinPurse {
         ItemStack coinPurseItem = ItemStack.of(ItemTypes.DYE, 1);
         coinPurseItem.offer(Keys.DYE_COLOR, DyeColors.BLACK);
 
-        // Enchant the item to make it glow
+        // Enchant the item to make it glow and hide it
         coinPurseItem.offer(Keys.ITEM_ENCHANTMENTS, ImmutableList.of(new ItemEnchantment(Enchantments.UNBREAKING, 1)));
+        coinPurseItem.offer(Keys.HIDE_ENCHANTMENTS, true);
 
         // Set the name
         coinPurseItem.offer(Keys.DISPLAY_NAME, Text.of(TextColors.GOLD, "[Coin Purse]"));
@@ -88,20 +82,25 @@ public class CoinPurse {
         coinPurseItem.offer(Keys.ITEM_LORE, ImmutableList.of(Text.of(TextColors.GRAY, economyService.getDefaultCurrency().format(BigDecimal.valueOf(amount)))));
 
         // Set the coin purse data
-        coinPurseItem.offer(CoinPurseKeys.COIN_PURSE_AMOUNT, amount);
-
+        coinPurseItem.getOrCreate(CoinPurseData.class).ifPresent(coinPurseData -> {
+            coinPurseData.set(CoinPurseKeys.COIN_PURSE_AMOUNT, amount);
+            coinPurseItem.offer(coinPurseData);
+        });
         return coinPurseItem;
     }
 
     @Listener
     public void onGameInit(GameInitializationEvent event) {
 
-        //Register Custom Data Manipulators
+        // Register Custom Data Manipulators
         CoinPurseDataRegister.registerData(getInstance());
     }
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
+
+        // Register Commands
+        CommandRegister.registerCommands(this);
 
         // Log Start Up to Console
         getLogger().info(

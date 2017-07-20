@@ -6,7 +6,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableData;
 import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 
 /**
  * Created by chase on 7/18/17.
@@ -45,7 +44,7 @@ public class ImmutableCoinPurseData extends AbstractImmutableData<ImmutableCoinP
 
     @Override
     public CoinPurseData asMutable() {
-        return new CoinPurseData(this.getAmount());
+        return new CoinPurseData(amount);
     }
 
     @Override
@@ -56,6 +55,6 @@ public class ImmutableCoinPurseData extends AbstractImmutableData<ImmutableCoinP
     @Override
     public DataContainer toContainer() {
         return super.toContainer()
-                .set(CoinPurseKeys.COIN_PURSE_AMOUNT, this.getAmount());
+                .set(CoinPurseKeys.COIN_PURSE_AMOUNT, amount);
     }
 }

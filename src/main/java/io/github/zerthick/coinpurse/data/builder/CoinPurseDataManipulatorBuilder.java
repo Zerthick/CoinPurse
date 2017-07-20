@@ -24,7 +24,7 @@ public class CoinPurseDataManipulatorBuilder extends AbstractDataBuilder<CoinPur
 
     @Override
     public Optional<CoinPurseData> createFrom(DataHolder dataHolder) {
-        return Optional.of(dataHolder.get(CoinPurseData.class).orElse(new CoinPurseData()));
+        return create().fill(dataHolder);
     }
 
     @Override

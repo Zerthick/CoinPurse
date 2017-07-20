@@ -29,7 +29,7 @@ public class CoinPurseData extends AbstractData<CoinPurseData, ImmutableCoinPurs
                 .defaultValue(0.0)
                 .minimum(0.0)
                 .maximum(Double.MAX_VALUE)
-                .actualValue(this.amount)
+                .actualValue(amount)
                 .build();
     }
 
@@ -51,8 +51,10 @@ public class CoinPurseData extends AbstractData<CoinPurseData, ImmutableCoinPurs
     @Override
     public Optional<CoinPurseData> fill(DataHolder dataHolder, MergeFunction overlap) {
 
-        CoinPurseData coinPurseData = overlap.merge(this, dataHolder.get(CoinPurseData.class).orElse(null));
-        setAmount(coinPurseData.getAmount());
+        dataHolder.get(CoinPurseData.class).ifPresent(data -> {
+            CoinPurseData finalData = overlap.merge(this, data);
+            setAmount(finalData.getAmount());
+        });
 
         return Optional.of(this);
     }
@@ -60,25 +62,20 @@ public class CoinPurseData extends AbstractData<CoinPurseData, ImmutableCoinPurs
     @Override
     public Optional<CoinPurseData> from(DataContainer container) {
 
-        if(container.contains(CoinPurseKeys.COIN_PURSE_AMOUNT.getQuery())) {
-            final double amount = container.getDouble(CoinPurseKeys.COIN_PURSE_AMOUNT.getQuery()).get();
+        container.getDouble(CoinPurseKeys.COIN_PURSE_AMOUNT.getQuery())
+                .ifPresent(this::setAmount);
 
-            setAmount(amount);
-
-            return Optional.of(this);
-        }
-
-        return Optional.empty();
+        return Optional.of(this);
     }
 
     @Override
     public CoinPurseData copy() {
-        return new CoinPurseData(this.getAmount());
+        return new CoinPurseData(amount);
     }
 
     @Override
     public ImmutableCoinPurseData asImmutable() {
-        return new ImmutableCoinPurseData(this.getAmount());
+        return new ImmutableCoinPurseData(amount);
     }
 
     @Override
@@ -89,6 +86,6 @@ public class CoinPurseData extends AbstractData<CoinPurseData, ImmutableCoinPurs
     @Override
     public DataContainer toContainer() {
         return super.toContainer()
-                .set(CoinPurseKeys.COIN_PURSE_AMOUNT, this.getAmount());
+                .set(CoinPurseKeys.COIN_PURSE_AMOUNT, getAmount());
     }
 }
