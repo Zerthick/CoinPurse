@@ -37,7 +37,7 @@ import java.math.BigDecimal;
         id = "coinpurse",
         name = "CoinPurse",
         version = "1.0.0",
-        description = "A simple plugin to convert money into a physical item",
+        description = "A simple plugin to currency money into a physical item",
         authors = {
                 "Zerthick"
         }
