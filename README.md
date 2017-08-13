@@ -1,6 +1,6 @@
 # CoinPurse
 
-A simple plugin to currency money into a physical item.  
+A simple plugin to convert currency into a physical item.  
 To "open" a coinpurse and collect it's contents simply hold it in your hand and left click!
  
 ## Commands
