@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Zerthick
+ * Copyright (C) 2018  Zerthick
  *
  * This file is part of CoinPurse.
  *
@@ -26,20 +26,20 @@ import io.github.zerthick.coinpurse.data.CoinPurseDataRegister;
 import io.github.zerthick.coinpurse.data.CoinPurseKeys;
 import io.github.zerthick.coinpurse.data.mutable.CoinPurseData;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
-import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.plugin.Plugin;
@@ -55,7 +55,6 @@ import java.math.BigDecimal;
 @Plugin(
         id = "coinpurse",
         name = "CoinPurse",
-        version = "1.0.0",
         description = "A simple plugin to convert currency into a physical item",
         authors = {
                 "Zerthick"
@@ -91,7 +90,13 @@ public class CoinPurse {
         coinPurseItem.offer(Keys.DYE_COLOR, DyeColors.BLACK);
 
         // Enchant the item to make it glow and hide it
-        coinPurseItem.offer(Keys.ITEM_ENCHANTMENTS, ImmutableList.of(new ItemEnchantment(Enchantments.UNBREAKING, 1)));
+
+        Enchantment enchantment = Enchantment.builder()
+                .type(EnchantmentTypes.UNBREAKING)
+                .level(1)
+                .build();
+
+        coinPurseItem.offer(Keys.ITEM_ENCHANTMENTS, ImmutableList.of(enchantment));
         coinPurseItem.offer(Keys.HIDE_ENCHANTMENTS, true);
 
         // Set the name
@@ -142,11 +147,14 @@ public class CoinPurse {
 
                             // Deposit the funds
                             economyService.getOrCreateAccount(player.getUniqueId()).ifPresent(playerAccount -> {
-                                TransactionResult result = playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), Cause.of(NamedCause.owner(getInstance())));
+                                Sponge.getCauseStackManager().pushCause(instance);
+                                Cause cause = Sponge.getCauseStackManager().getCurrentCause();
+                                TransactionResult result = playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
+                                Sponge.getCauseStackManager().popCause();
                                 if(result.getResult() == ResultType.SUCCESS) {
 
                                     // If the have more that one item in the stack, decrement it, otherwise remove the item
-                                    if(item.getCount() > 1) {
+                                    if(item.getQuantity() > 1) {
                                         ItemStack newItem = item.createStack();
                                         newItem.setQuantity(newItem.getQuantity() - 1);
                                         player.setItemInHand(event.getHandType(), newItem);

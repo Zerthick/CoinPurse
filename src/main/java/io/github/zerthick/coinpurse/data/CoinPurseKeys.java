@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Zerthick
+ * Copyright (C) 2018  Zerthick
  *
  * This file is part of CoinPurse.
  *
@@ -22,11 +22,19 @@ package io.github.zerthick.coinpurse.data;
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 
 public class CoinPurseKeys {
 
-    public static final Key<MutableBoundedValue<Double>> COIN_PURSE_AMOUNT = KeyFactory.makeSingleKey(TypeToken.of(Double.class),
-            new TypeToken<MutableBoundedValue<Double>>(){}, DataQuery.of("CoinPurseAmount"),"coinpurse:coin_purse_amount", "Coin Purse Amount");
+    public static Key<MutableBoundedValue<Double>> COIN_PURSE_AMOUNT;
+
+    public static void init() {
+        COIN_PURSE_AMOUNT = Key.builder()
+                .type(new TypeToken<MutableBoundedValue<Double>>(){})
+                .query(DataQuery.of("CoinPurseAmount"))
+                .id("coinpurse:coin_purse_amount")
+                .name("Coin Purse Amount")
+                .build();
+    }
+
 }

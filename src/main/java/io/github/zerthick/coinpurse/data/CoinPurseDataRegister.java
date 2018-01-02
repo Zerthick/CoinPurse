@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Zerthick
+ * Copyright (C) 2018  Zerthick
  *
  * This file is part of CoinPurse.
  *
@@ -27,6 +27,9 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public class CoinPurseDataRegister {
     public static void registerData(PluginContainer container) {
+
+        CoinPurseKeys.init();
+
         DataRegistration.<CoinPurseData, ImmutableCoinPurseData>builder()
                 .dataClass(CoinPurseData.class)
                 .immutableClass(ImmutableCoinPurseData.class)

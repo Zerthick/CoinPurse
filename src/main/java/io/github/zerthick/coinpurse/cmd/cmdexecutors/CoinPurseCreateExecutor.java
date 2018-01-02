@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Zerthick
+ * Copyright (C) 2018  Zerthick
  *
  * This file is part of CoinPurse.
  *
@@ -20,13 +20,12 @@
 package io.github.zerthick.coinpurse.cmd.cmdexecutors;
 
 import io.github.zerthick.coinpurse.CoinPurse;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.service.economy.EconomyService;
@@ -44,7 +43,7 @@ public class CoinPurseCreateExecutor extends AbstractCommandExecutor{
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(CommandSource src, CommandContext args) {
 
         Optional<Double> amountOptional = args.getOne(CommandArgs.AMOUNT);
 
@@ -53,7 +52,11 @@ public class CoinPurseCreateExecutor extends AbstractCommandExecutor{
             amountOptional.ifPresent(amount -> {
                 EconomyService economyService = plugin.getEconomyService();
                 economyService.getOrCreateAccount(player.getUniqueId()).ifPresent(playerAccount -> {
-                    TransactionResult transactionResult = playerAccount.withdraw(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), Cause.of(NamedCause.owner(container)));
+
+                    Sponge.getCauseStackManager().pushCause(plugin.getInstance());
+                    Cause cause = Sponge.getCauseStackManager().getCurrentCause();
+
+                    TransactionResult transactionResult = playerAccount.withdraw(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
                     switch (transactionResult.getResult()) {
                         case SUCCESS:
 
@@ -66,7 +69,9 @@ public class CoinPurseCreateExecutor extends AbstractCommandExecutor{
                             // If the player doesn't have space revert the transaction
                             if(!inventoryTransactionResult.getRejectedItems().isEmpty()) {
                                 player.sendMessage(Text.of(TextColors.RED, "You don't have enough space in your inventory!"));
-                                playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), Cause.of(NamedCause.owner(container)));
+
+                                playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
+
                             }
                             break;
                         case ACCOUNT_NO_FUNDS:
@@ -75,6 +80,7 @@ public class CoinPurseCreateExecutor extends AbstractCommandExecutor{
                         default:
                             player.sendMessage(Text.of(TextColors.RED, "Unknown error!"));
                     }
+                    Sponge.getCauseStackManager().popCause();
                 });
             });
         } else {

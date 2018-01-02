@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Zerthick
+ * Copyright (C) 2018  Zerthick
  *
  * This file is part of CoinPurse.
  *
@@ -20,14 +20,12 @@
 package io.github.zerthick.coinpurse.cmd.cmdexecutors;
 
 import io.github.zerthick.coinpurse.CoinPurse;
-import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
-import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -40,7 +38,7 @@ public class CoinPurseAdminCreateExecutor extends AbstractCommandExecutor{
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(CommandSource src, CommandContext args) {
 
         Optional<Double> amountOptional = args.getOne(CommandArgs.AMOUNT);
         Optional<Player> targetPlayerOptional = args.getOne(CommandArgs.PLAYER);
@@ -50,7 +48,6 @@ public class CoinPurseAdminCreateExecutor extends AbstractCommandExecutor{
             Player targetPlayer = targetPlayerOptional.get();
 
             amountOptional.ifPresent(amount -> {
-                EconomyService economyService = plugin.getEconomyService();
 
                 // Build coin purse item
                 ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
@@ -69,7 +66,6 @@ public class CoinPurseAdminCreateExecutor extends AbstractCommandExecutor{
             if (src instanceof Player) {
                 Player player = (Player) src;
                 amountOptional.ifPresent(amount -> {
-                    EconomyService economyService = plugin.getEconomyService();
 
                     // Build coin purse item
                     ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
