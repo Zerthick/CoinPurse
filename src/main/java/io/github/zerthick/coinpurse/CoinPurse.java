@@ -161,8 +161,13 @@ public class CoinPurse {
                                     } else {
                                         player.setItemInHand(event.getHandType(),null);
                                     }
+
+                                    player.sendMessage(Text.of(TextColors.YELLOW, "You've opened a Coin Purse containing ",
+                                            TextColors.GOLD, economyService.getDefaultCurrency().format(BigDecimal.valueOf(amount))));
                                 }
                             });
+                        } else {
+                            player.sendMessage(Text.of(TextColors.RED, "You don't have permission to open Coin Purses!"));
                         }
 
                         // Cancel interacting with the ink sac

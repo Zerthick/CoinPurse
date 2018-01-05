@@ -35,10 +35,10 @@ public class CoinPurseInfoExecutor extends AbstractCommandExecutor{
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) {
 
-        src.sendMessage(Text.of(TextColors.DARK_GREEN, container.getName(),
-                TextColors.GREEN, " version: ", TextColors.DARK_GREEN,
-                container.getVersion().orElse(""), TextColors.GREEN, " by ",
-                TextColors.DARK_GREEN, "Zerthick"));
+        src.sendMessage(Text.of(TextColors.GOLD, container.getName(),
+                TextColors.YELLOW, " version: ", TextColors.GOLD,
+                container.getVersion().orElse(""), TextColors.YELLOW, " by ",
+                TextColors.GOLD, "Zerthick"));
 
         return CommandResult.success();
     }
