@@ -31,7 +31,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -147,10 +146,7 @@ public class CoinPurse {
 
                             // Deposit the funds
                             economyService.getOrCreateAccount(player.getUniqueId()).ifPresent(playerAccount -> {
-                                Sponge.getCauseStackManager().pushCause(instance);
-                                Cause cause = Sponge.getCauseStackManager().getCurrentCause();
-                                TransactionResult result = playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
-                                Sponge.getCauseStackManager().popCause();
+                                TransactionResult result = playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), Sponge.getCauseStackManager().getCurrentCause());
                                 if(result.getResult() == ResultType.SUCCESS) {
 
                                     // If the have more that one item in the stack, decrement it, otherwise remove the item
