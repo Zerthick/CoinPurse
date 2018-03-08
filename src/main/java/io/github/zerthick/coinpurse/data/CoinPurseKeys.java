@@ -32,7 +32,7 @@ public class CoinPurseKeys {
         COIN_PURSE_AMOUNT = Key.builder()
                 .type(new TypeToken<MutableBoundedValue<Double>>(){})
                 .query(DataQuery.of("CoinPurseAmount"))
-                .id("coinpurse:coin_purse_amount")
+                .id("coin_purse_amount")
                 .name("Coin Purse Amount")
                 .build();
     }

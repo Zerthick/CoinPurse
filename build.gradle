@@ -36,6 +36,7 @@ repositories {
 
 spongestart{
     minecraft '1.12.2'
+    spongeForge '1.12.2-2611-7.1.0-BETA-2952'
 }
 
 dependencies {
