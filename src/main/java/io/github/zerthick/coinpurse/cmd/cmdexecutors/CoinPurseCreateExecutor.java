@@ -50,38 +50,42 @@ public class CoinPurseCreateExecutor extends AbstractCommandExecutor{
         if(src instanceof Player) {
             Player player = (Player) src;
             amountOptional.ifPresent(amount -> {
-                EconomyService economyService = plugin.getEconomyService();
-                economyService.getOrCreateAccount(player.getUniqueId()).ifPresent(playerAccount -> {
 
-                    Sponge.getCauseStackManager().pushCause(plugin.getInstance());
-                    Cause cause = Sponge.getCauseStackManager().getCurrentCause();
+                if (amount <= 0) {
 
-                    TransactionResult transactionResult = playerAccount.withdraw(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
-                    switch (transactionResult.getResult()) {
-                        case SUCCESS:
+                    src.sendMessage(Text.of(TextColors.RED, "Amount must be positive!"));
 
-                            // Build coin purse item
-                            ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
+                } else {
+                    EconomyService economyService = plugin.getEconomyService();
+                    economyService.getOrCreateAccount(player.getUniqueId()).ifPresent(playerAccount -> {
 
-                            // Transfer the item to the player's inventory
-                            InventoryTransactionResult inventoryTransactionResult = player.getInventory().offer(coinPurseItem);
+                        Cause cause = Sponge.getCauseStackManager().getCurrentCause();
 
-                            // If the player doesn't have space revert the transaction
-                            if(!inventoryTransactionResult.getRejectedItems().isEmpty()) {
-                                player.sendMessage(Text.of(TextColors.RED, "You don't have enough space in your inventory!"));
+                        TransactionResult transactionResult = playerAccount.withdraw(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
+                        switch (transactionResult.getResult()) {
+                            case SUCCESS:
+                                // Build coin purse item
+                                ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
 
-                                playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
+                                // Transfer the item to the player's inventory
+                                InventoryTransactionResult inventoryTransactionResult = player.getInventory().offer(coinPurseItem);
 
-                            }
-                            break;
-                        case ACCOUNT_NO_FUNDS:
-                            player.sendMessage(Text.of(TextColors.RED, "You don't have enough funds!"));
-                            break;
-                        default:
-                            player.sendMessage(Text.of(TextColors.RED, "Unknown error!"));
-                    }
-                    Sponge.getCauseStackManager().popCause();
-                });
+                                // If the player doesn't have space revert the transaction
+                                if (!inventoryTransactionResult.getRejectedItems().isEmpty()) {
+                                    player.sendMessage(Text.of(TextColors.RED, "You don't have enough space in your inventory!"));
+
+                                    playerAccount.deposit(economyService.getDefaultCurrency(), BigDecimal.valueOf(amount), cause);
+
+                                }
+                                break;
+                            case ACCOUNT_NO_FUNDS:
+                                player.sendMessage(Text.of(TextColors.RED, "You don't have enough funds!"));
+                                break;
+                            default:
+                                player.sendMessage(Text.of(TextColors.RED, "Unknown error!"));
+                        }
+                    });
+                }
             });
         } else {
             src.sendMessage(Text.of("You can't create a normal Coin Purse from the console!"));

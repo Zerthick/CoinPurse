@@ -49,15 +49,22 @@ public class CoinPurseAdminCreateExecutor extends AbstractCommandExecutor{
 
             amountOptional.ifPresent(amount -> {
 
-                // Build coin purse item
-                ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
+                if (amount <= 0) {
 
-                // Transfer the item to the player's inventory
-                InventoryTransactionResult inventoryTransactionResult = targetPlayer.getInventory().offer(coinPurseItem);
+                    src.sendMessage(Text.of(TextColors.RED, "Amount must be positive!"));
 
-                // If the player doesn't have space tell them
-                if (!inventoryTransactionResult.getRejectedItems().isEmpty()) {
-                    src.sendMessage(Text.of(TextColors.RED, "The target player doesn't have enough space in their inventory!"));
+                } else {
+
+                    // Build coin purse item
+                    ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
+
+                    // Transfer the item to the player's inventory
+                    InventoryTransactionResult inventoryTransactionResult = targetPlayer.getInventory().offer(coinPurseItem);
+
+                    // If the player doesn't have space tell them
+                    if (!inventoryTransactionResult.getRejectedItems().isEmpty()) {
+                        src.sendMessage(Text.of(TextColors.RED, "The target player doesn't have enough space in their inventory!"));
+                    }
                 }
 
             });
@@ -67,15 +74,23 @@ public class CoinPurseAdminCreateExecutor extends AbstractCommandExecutor{
                 Player player = (Player) src;
                 amountOptional.ifPresent(amount -> {
 
-                    // Build coin purse item
-                    ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
+                    if (amount <= 0) {
 
-                    // Transfer the item to the player's inventory
-                    InventoryTransactionResult inventoryTransactionResult = player.getInventory().offer(coinPurseItem);
+                        src.sendMessage(Text.of(TextColors.RED, "Amount must be positive!"));
 
-                    // If the player doesn't have space tell them
-                    if (!inventoryTransactionResult.getRejectedItems().isEmpty()) {
-                        player.sendMessage(Text.of(TextColors.RED, "You don't have enough space in your inventory!"));
+                    } else {
+
+                        // Build coin purse item
+                        ItemStack coinPurseItem = plugin.buildCoinPurseItem(amount);
+
+                        // Transfer the item to the player's inventory
+                        InventoryTransactionResult inventoryTransactionResult = player.getInventory().offer(coinPurseItem);
+
+                        // If the player doesn't have space tell them
+                        if (!inventoryTransactionResult.getRejectedItems().isEmpty()) {
+                            player.sendMessage(Text.of(TextColors.RED, "You don't have enough space in your inventory!"));
+                        }
+
                     }
 
                 });
